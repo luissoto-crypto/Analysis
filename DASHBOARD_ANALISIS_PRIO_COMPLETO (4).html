@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 24px; font-size: 13px; background: #f9fafb; }
+
+  .header { background: white; padding: 24px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid #FF6B35; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .title { font-size: 22px; font-weight: 700; color: #004B87; margin-bottom: 8px; }
+  .subtitle { font-size: 12px; color: #6b7280; }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .kpi { background: white; padding: 14px; border-radius: 6px; border-left: 3px solid #FF6B35; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .kpi-value { font-size: 20px; font-weight: 700; color: #004B87; }
+  .kpi-label { font-size: 11px; color: #6b7280; margin-top: 4px; }
+
+  .section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 24px; }
+  .section-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; color: #004B87; border-bottom: 2px solid #FF6B35; padding-bottom: 12px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  @media (max-width: 1200px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .chart-box { background: white; padding: 20px; border-radius: 8px; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
+  th { background: #f3f4f6; font-weight: 600; color: #374151; }
+  tr:hover { background: #f9fafb; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #e5e7eb; flex-wrap: wrap; }
+  .tab-btn { padding: 8px 14px; background: transparent; border: none; cursor: pointer; font-size: 12px; font-weight: 600; color: #6b7280; border-bottom: 2px solid transparent; }
+  .tab-btn.active { color: #FF6B35; border-bottom-color: #FF6B35; font-weight: 700; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .stat-box { background: #f9fafb; padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #FF6B35; }
+  .stat-label { font-size: 11px; color: #004B87; font-weight: 700; }
+  .stat-value { font-size: 16px; font-weight: 700; color: #1f2937; margin-top: 2px; }
+
+  .razones-list { list-style: none; margin: 12px 0; }
+  .razones-list li { padding: 8px; background: #f9fafb; border-left: 3px solid #FF6B35; margin-bottom: 8px; }
+  .razones-list li strong { display: block; font-size: 13px; color: #004B87; }
+  .razones-list li span { display: block; font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+  .appendix { background: white; padding: 20px; border-radius: 8px; margin-top: 24px; border-left: 4px solid #FF6B35; }
+  .appendix-title { font-size: 14px; font-weight: 700; color: #004B87; margin-bottom: 16px; border-bottom: 2px solid #FF6B35; padding-bottom: 12px; }
+  .paternity-item { padding: 12px; background: #f9fafb; border-left: 3px solid #FF6B35; margin-bottom: 10px; border-radius: 4px; }
+  .paternity-name { font-weight: 600; color: #004B87; font-size: 13px; }
+  .paternity-schedule { color: #6b7280; font-size: 12px; margin-top: 4px; }
+  .paternity-note { font-size: 11px; color: #7c3aed; margin-top: 6px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;">
+    <div>
+      <div class="title">PRIO Analysis | ES Sales B2B Last 60 Days</div>
+      <div class="subtitle">Últimos 60 días | 92 AMs | TEST: 25 AMs con análisis de razones PRIO | Objetivo: 40 intentos/día</div>
+    </div>
+    <img src="auto1-logo.png" alt="AUTO1.com" style="height: 60px; flex-shrink: 0; object-fit: contain;"/>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="kpi">
+    <div class="kpi-value">92</div>
+    <div class="kpi-label">Total AMs</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value">25</div>
+    <div class="kpi-label">AMs en TEST</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value">38.0</div>
+    <div class="kpi-label">Promedio PRIO</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value">557</div>
+    <div class="kpi-label">Casos analizados</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value">66.7%</div>
+    <div class="kpi-label">Tasa utilización</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('ranking')">📋 Ranking AMs Completo</button>
+    <button class="tab-btn" onclick="switchTab('test')">🔬 TEST: 25 AMs + Razones</button>
+    <button class="tab-btn" onclick="switchTab('analisis')">📈 Análisis Razones PRIO</button>
+  </div>
+
+  <!-- TAB 1: RANKING COMPLETO -->
+  <div id="ranking" class="tab-content active">
+    <div class="section-title">Ranking Completo: 92 AMs Ordenados por Intentos PRIO (Mayor a Menor)</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 30px;">Pos</th>
+          <th>Nombre</th>
+          <th>Team</th>
+          <th style="text-align: center;">Nivel</th>
+          <th style="text-align: center;">Cuentas</th>
+          <th style="text-align: center;">Intentos PRIO</th>
+          <th style="text-align: center;">% Cumplimiento</th>
+        </tr>
+      </thead>
+      <tbody id="ranking-body">
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TAB 2: TEST 24 AMs -->
+  <div id="test" class="tab-content">
+    <div class="section-title">TEST: 25 AMs con Análisis de Razones PRIO (Sem. 36)</div>
+    <div style="margin-bottom: 16px; padding: 12px; background: #f0f9ff; border-left: 4px solid #FF6B35; border-radius: 4px;">
+      <strong style="color: #004B87; display: block;">📌 Información del TEST</strong>
+      <span style="color: #004B87; font-size: 12px; line-height: 1.5;">Rango cartera: 185-242 cuentas | 557 casos de no llamada analizados | PRIO List: 60 clientes/día (L-V) | Objetivo: 40 intentos/día</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 30px;">Pos</th>
+          <th>Nombre</th>
+          <th>Team</th>
+          <th>Nivel</th>
+          <th style="text-align: center;">Cuentas</th>
+          <th style="text-align: center;">Ya Contactado</th>
+          <th style="text-align: center;">Grupos</th>
+          <th style="text-align: center;">Cuestiones</th>
+          <th style="text-align: center;">Vacaciones</th>
+          <th style="text-align: center;">Total Razones</th>
+        </tr>
+      </thead>
+      <tbody id="test-body">
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TAB 3: ANÁLISIS RAZONES -->
+  <div id="analisis" class="tab-content">
+    <div class="section-title">Razones de No Llamada PRIO - Desglose Detallado</div>
+
+    <div class="grid-2">
+      <div class="chart-box">
+        <div style="font-weight: 600; margin-bottom: 12px;">Distribución de Casos (557 total)</div>
+        <canvas id="razonesChart2"></canvas>
+      </div>
+
+      <div class="chart-box">
+        <div style="font-weight: 600; margin-bottom: 12px;">Desglose por Razón</div>
+        <ul class="razones-list">
+          <li>
+            <strong>Ya contactado por otra vía</strong>
+            <span>242 casos (43.45%)</span>
+          </li>
+          <li>
+            <strong>Gestión de grupos o duplicados</strong>
+            <span>139 casos (24.96%)</span>
+          </li>
+          <li>
+            <strong>Cuestiones comerciales</strong>
+            <span>126 casos (22.62%)</span>
+          </li>
+          <li>
+            <strong>No disponible (Vacaciones)</strong>
+            <span>50 casos (8.97%)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;">
+
+    <!-- APÉNDICES CONTEXTALES -->
+    <!-- AMs con Reducción de Jornada por Paternidad -->
+    <div class="appendix">
+      <div class="appendix-title">📌 APÉNDICE 1: AMs con Reducción de Jornada por Paternidad</div>
+
+      <div style="margin-bottom: 16px; padding: 12px; background: #fff7ed; border-left: 4px solid #FF6B35; border-radius: 4px;">
+        <strong style="color: #004B87; display: block; margin-bottom: 8px;">⚠️ FACTOR DE AJUSTE EN ACTIVIDAD</strong>
+        <span style="color: #004B87; font-size: 12px; line-height: 1.6;">
+          Los siguientes Account Managers tienen reducción de jornada laboral por paternidad, lo que impacta directamente en sus números de intentos PRIO.
+          Esta información es crítica para interpretar correctamente su desempeño, ya que sus KPIs no reflejan falta de eficiencia sino disponibilidad de tiempo reducida.
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-bottom: 24px;">
+        <div class="paternity-item">
+          <div class="paternity-name">Mikel Cano Mena</div>
+          <div class="paternity-schedule">⏰ Horario: 09:00 a.m. - 03:00 p.m. (6 horas)</div>
+          <div class="paternity-note">Reducción: 25% de jornada (tiempo completo: 8 horas)</div>
+        </div>
+        <div class="paternity-item">
+          <div class="paternity-name">David Muñoz Rodríguez</div>
+          <div class="paternity-schedule">⏰ Horario: 09:00 a.m. - 05:00 p.m. (8 horas)</div>
+          <div class="paternity-note">Reducción: Flexible con descansos adicionales</div>
+        </div>
+        <div class="paternity-item">
+          <div class="paternity-name">Joel Ledesma del Álamo</div>
+          <div class="paternity-schedule">⏰ Horario: 09:00 a.m. - 05:00 p.m. (8 horas)</div>
+          <div class="paternity-note">Reducción: Flexible con descansos adicionales</div>
+        </div>
+        <div class="paternity-item">
+          <div class="paternity-name">Nuria Utrilla Ramírez</div>
+          <div class="paternity-schedule">⏰ Horario: 09:00 a.m. - 04:00 p.m. (7 horas)</div>
+          <div class="paternity-note">Reducción: 12.5% de jornada (tiempo completo: 8 horas)</div>
+        </div>
+        <div class="paternity-item">
+          <div class="paternity-name">Sergio Antolín de León</div>
+          <div class="paternity-schedule">⏰ Horario: 09:00 a.m. - 03:00 p.m. (6 horas)</div>
+          <div class="paternity-note">Reducción: 25% de jornada (tiempo completo: 8 horas)</div>
+        </div>
+        <div class="paternity-item">
+          <div class="paternity-name">Víctor Vidal Vázquez</div>
+          <div class="paternity-schedule">⏰ Horario: 10:00 a.m. - 05:00 p.m. (7 horas)</div>
+          <div class="paternity-note">Reducción: 12.5% de jornada (tiempo completo: 8 horas)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW HIRES: Ingresados en Agosto -->
+    <div class="appendix">
+      <div class="appendix-title">🆕 APÉNDICE 2: NEW HIRES - Ingresados en Agosto 2026</div>
+
+      <div style="margin-bottom: 16px; padding: 12px; background: #fff7ed; border-left: 4px solid #FF6B35; border-radius: 4px;">
+        <strong style="color: #004B87; display: block; margin-bottom: 8px;">⚠️ PERÍODO DE ONBOARDING</strong>
+        <span style="color: #004B87; font-size: 12px; line-height: 1.6;">
+          15 Account Managers ingresaron en Agosto 2026 y están en período de adaptación. Sus números pueden ser menores mientras adquieren experiencia y se integran al equipo.
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px;">
+        <div class="paternity-item"><div class="paternity-name">Victor Gomez Gutierrez</div><div class="paternity-note">Estado: Baja definitiva</div></div>
+        <div class="paternity-item"><div class="paternity-name">Fredmarys Auxiliadora Abreu Aguilar</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Carlos Ivan Ramirez Guerrero</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Luis Jose Coraspe Santana</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Sara Reguero Francés</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Nilton Alberto Feliz Pineda</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Víctor Venegas Lillo</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Gabriela Crespo Andrades</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Neisy Janet Jardin</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">David de la Casa</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Milena Montserrat López Salvatierra</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Iratxe Gonzalo Manzano</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Jesús Rico Suárez</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Durbinth Yaneth Pacheco Pallares</div><div class="paternity-note">En período de ramp-up</div></div>
+        <div class="paternity-item"><div class="paternity-name">Alejandro Alvarez Gonzalez</div><div class="paternity-note">En período de ramp-up</div></div>
+      </div>
+    </div>
+
+    <!-- CARTERA HUNTERS: Base de Datos Comprada para Junior AMs -->
+    <div class="appendix">
+      <div class="appendix-title">🎯 APÉNDICE 3: CARTERA ESPECIAL "HUNTERS" - AMs Junior</div>
+
+      <div style="margin-bottom: 16px; padding: 12px; background: #fff7ed; border-left: 4px solid #FF6B35; border-radius: 4px;">
+        <strong style="color: #004B87; display: block; margin-bottom: 8px;">📊 BASE DE DATOS COMPRADA - PROSPECCIÓN</strong>
+        <span style="color: #004B87; font-size: 12px; line-height: 1.6;">
+          Todos los AMs Junior cuentan con <strong>39 cuentas cada uno</strong> de la base de datos "Hunters" dedicadas a validación de datos de contacto.
+          De vez en cuando alguna aparece en PRIO List, introduciendo variabilidad en las métricas.
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="stat-box">
+          <div class="stat-label">📋 ESTRUCTURA</div>
+          <div style="margin-top: 8px; line-height: 1.6; font-size: 12px;">
+            <strong>39 cuentas Hunters por Junior AM</strong><br>
+            Propósito: Validación de datos de contacto<br>
+            Objetivo: Convertir a clientes regulares
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">⚠️ IMPACTO EN MÉTRICAS</div>
+          <div style="margin-top: 8px; line-height: 1.6; font-size: 12px;">
+            Cartera efectiva PRIO reducida en 39 cuentas.<br>
+            Ejemplo: 220 cuentas registradas = 181 para PRIO.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Datos de ranking - todos los 92 AMs
+  const rankingData = [
+    {pos: 1, nombre: "Alonso Cesarini", team: "Daniel", nivel: "Junior", cuentas: 220, prio: 55.7, cum: 139.2},
+    {pos: 2, nombre: "Paula Guerrero Garcia", team: "Lidia", nivel: "Junior", cuentas: 244, prio: 54.4, cum: 136.0},
+    {pos: 3, nombre: "Samira Akbib", team: "Lidia", nivel: "Junior", cuentas: 206, prio: 53.9, cum: 134.8},
+    {pos: 4, nombre: "Alberto Feliz", team: "Tamara", nivel: "Junior", cuentas: 177, prio: 53.7, cum: 134.2},
+    {pos: 5, nombre: "Elena Izquierdo Ruiz", team: "Luis", nivel: "Junior", cuentas: 208, prio: 53.6, cum: 134.0},
+    {pos: 6, nombre: "Valeria Lahoz", team: "Luis", nivel: "Junior", cuentas: 233, prio: 53.3, cum: 133.2},
+    {pos: 7, nombre: "Paola Baez", team: "Tamara", nivel: "Junior", cuentas: 244, prio: 52.9, cum: 132.2},
+    {pos: 8, nombre: "Sandra Amaya", team: "Jorge", nivel: "Junior", cuentas: 227, prio: 52.2, cum: 130.5},
+    {pos: 9, nombre: "Santiago Méndez Propato", team: "Jorge", nivel: "Junior", cuentas: 220, prio: 51.2, cum: 128.0},
+    {pos: 10, nombre: "Ivan Ramirez", team: "Carla", nivel: "Junior", cuentas: 249, prio: 50.3, cum: 125.7},
+    {pos: 11, nombre: "Daniel Santos", team: "Tamara", nivel: "Junior", cuentas: 221, prio: 47.5, cum: 118.8},
+    {pos: 12, nombre: "Lorenzo Anta", team: "Tamara", nivel: "Junior", cuentas: 218, prio: 47.3, cum: 118.2},
+    {pos: 13, nombre: "Sara Alonso", team: "Daniel", nivel: "Junior", cuentas: 220, prio: 47.0, cum: 117.5},
+    {pos: 14, nombre: "Sandra Santos", team: "Lidia", nivel: "Junior", cuentas: 227, prio: 46.5, cum: 116.3},
+    {pos: 15, nombre: "Maria Dolores Lara Rosales", team: "David", nivel: "Junior", cuentas: 229, prio: 45.9, cum: 114.8},
+    {pos: 16, nombre: "Pablo Morales", team: "Luis", nivel: "Junior", cuentas: 244, prio: 45.5, cum: 113.8},
+    {pos: 17, nombre: "Adrian Torremocha", team: "Lidia", nivel: "Junior", cuentas: 242, prio: 45.5, cum: 113.8},
+    {pos: 18, nombre: "Carolina Fallos", team: "David", nivel: "Junior", cuentas: 226, prio: 44.5, cum: 111.2},
+    {pos: 19, nombre: "David Carrasco", team: "Tamara", nivel: "Senior", cuentas: 213, prio: 43.5, cum: 108.7},
+    {pos: 20, nombre: "Maria Hernandez", team: "David", nivel: "Junior", cuentas: 204, prio: 43.1, cum: 107.8},
+    {pos: 21, nombre: "Jose Carlos Bolobaha", team: "David", nivel: "Junior", cuentas: 218, prio: 43.0, cum: 107.5},
+    {pos: 22, nombre: "David Lacalle Rubio", team: "Carla", nivel: "Senior", cuentas: 213, prio: 41.6, cum: 104.0},
+    {pos: 23, nombre: "Sara Reguero", team: "David", nivel: "Junior", cuentas: 220, prio: 41.2, cum: 103.0},
+    {pos: 24, nombre: "Mariannina Rucci", team: "Daniel", nivel: "Junior", cuentas: 229, prio: 41.1, cum: 102.8},
+    {pos: 25, nombre: "Daniel Garcia", team: "Luis", nivel: "Junior", cuentas: 232, prio: 40.6, cum: 101.5},
+    {pos: 26, nombre: "Gonzalo Gallego", team: "Lidia", nivel: "Junior", cuentas: 179, prio: 40.6, cum: 101.5},
+    {pos: 27, nombre: "Carlos Carmona Rodriguez", team: "Lidia", nivel: "Junior", cuentas: 218, prio: 40.1, cum: 100.2},
+    {pos: 28, nombre: "Jesus Rico", team: "Jorge", nivel: "Junior", cuentas: 181, prio: 39.6, cum: 99.0},
+    {pos: 29, nombre: "Jorge Diaz", team: "Daniel", nivel: "Junior", cuentas: 223, prio: 39.3, cum: 98.2},
+    {pos: 30, nombre: "Cora Hidalgo", team: "Tamara", nivel: "Junior", cuentas: 181, prio: 39.2, cum: 98.0},
+    {pos: 31, nombre: "Miguel Ángel Arenas Soler", team: "David", nivel: "Senior", cuentas: 195, prio: 38.9, cum: 97.2},
+    {pos: 32, nombre: "Milena Lopez", team: "Tamara", nivel: "Senior", cuentas: 195, prio: 38.8, cum: 97.0},
+    {pos: 33, nombre: "Razvan Sandu", team: "Tamara", nivel: "Junior", cuentas: 229, prio: 38.6, cum: 96.5},
+    {pos: 34, nombre: "Neisy Jardin", team: "Carla", nivel: "Junior", cuentas: 181, prio: 38.6, cum: 96.5},
+    {pos: 35, nombre: "Luis Sixto", team: "Lidia", nivel: "Junior", cuentas: 181, prio: 38.5, cum: 96.2},
+    {pos: 36, nombre: "Luis Coraspe", team: "Carla", nivel: "Junior", cuentas: 181, prio: 38.3, cum: 95.7},
+    {pos: 37, nombre: "Jesus Merino", team: "Carla", nivel: "Junior", cuentas: 181, prio: 38.2, cum: 95.5},
+    {pos: 38, nombre: "Victor Martin Tojar", team: "Tamara", nivel: "Junior", cuentas: 234, prio: 37.8, cum: 94.5},
+    {pos: 39, nombre: "Mercedes Ruiz", team: "Daniel", nivel: "Junior", cuentas: 208, prio: 37.8, cum: 94.5},
+    {pos: 40, nombre: "Javiera Iñigo", team: "Lidia", nivel: "Junior", cuentas: 229, prio: 37.5, cum: 93.8},
+    {pos: 41, nombre: "Ivan Talarewitz", team: "David", nivel: "Junior", cuentas: 222, prio: 37.5, cum: 93.8},
+    {pos: 42, nombre: "Samuel Daza", team: "Jorge", nivel: "Junior", cuentas: 231, prio: 37.4, cum: 93.5},
+    {pos: 43, nombre: "Arantxa Olmeda", team: "David", nivel: "Mid", cuentas: 215, prio: 37.1, cum: 92.8},
+    {pos: 44, nombre: "Juan Sempere", team: "Carla", nivel: "Junior", cuentas: 236, prio: 37.0, cum: 92.5},
+    {pos: 45, nombre: "Antonio Manuel", team: "Luis", nivel: "Senior", cuentas: 206, prio: 36.9, cum: 92.2},
+    {pos: 46, nombre: "Manuel Nuevo", team: "Carla", nivel: "Senior", cuentas: 206, prio: 36.8, cum: 92.0},
+    {pos: 47, nombre: "Alba Campos Maraver", team: "Jorge", nivel: "Junior", cuentas: 126, prio: 36.5, cum: 91.2},
+    {pos: 48, nombre: "David Contento", team: "Jorge", nivel: "Senior", cuentas: 213, prio: 36.4, cum: 91.0},
+    {pos: 49, nombre: "Maria Diez Poveda", team: "Tamara", nivel: "Junior", cuentas: 229, prio: 36.3, cum: 90.8},
+    {pos: 50, nombre: "Karina Propato Paez", team: "Luis", nivel: "Junior", cuentas: 220, prio: 36.3, cum: 90.8},
+    {pos: 51, nombre: "Jose Gonnella", team: "David", nivel: "Senior", cuentas: 206, prio: 36.3, cum: 90.8},
+    {pos: 52, nombre: "David de la Casa", team: "David", nivel: "Senior", cuentas: 213, prio: 36.3, cum: 90.8},
+    {pos: 53, nombre: "Marcos Otero", team: "Tamara", nivel: "Junior", cuentas: 221, prio: 35.9, cum: 89.8},
+    {pos: 54, nombre: "David Munoz Rodriguez", team: "Carla", nivel: "Senior", cuentas: 213, prio: 35.8, cum: 89.5},
+    {pos: 55, nombre: "Iratxe Gonzalo", team: "Tamara", nivel: "Junior", cuentas: 179, prio: 35.6, cum: 89.0},
+    {pos: 56, nombre: "Jose Manuel Nogales Romero", team: "Daniel", nivel: "Junior", cuentas: 204, prio: 35.6, cum: 89.0},
+    {pos: 57, nombre: "Ruben Palacios Liebana", team: "David", nivel: "Senior", cuentas: 200, prio: 35.4, cum: 88.5},
+    {pos: 58, nombre: "Raquel Moreno Lopez", team: "Jorge", nivel: "Senior", cuentas: 195, prio: 35.1, cum: 87.8},
+    {pos: 59, nombre: "Guillermo Arias Esteban", team: "Lidia", nivel: "Mid", cuentas: 208, prio: 35.0, cum: 87.5},
+    {pos: 60, nombre: "Jose Gonzalo", team: "Luis", nivel: "Senior", cuentas: 206, prio: 34.8, cum: 87.0},
+    {pos: 61, nombre: "Victor Venegas", team: "Tamara", nivel: "Mid", cuentas: 210, prio: 33.9, cum: 84.7},
+    {pos: 62, nombre: "Lydia Rivas", team: "Lidia", nivel: "Junior", cuentas: 225, prio: 33.5, cum: 83.8},
+    {pos: 63, nombre: "David Seriñan", team: "Jorge", nivel: "Senior", cuentas: 213, prio: 33.1, cum: 82.8},
+    {pos: 64, nombre: "Durbinth Pacheco", team: "Tamara", nivel: "Junior", cuentas: 180, prio: 32.7, cum: 81.8},
+    {pos: 65, nombre: "Judith Vegas Villanueva", team: "Lidia", nivel: "Senior", cuentas: 223, prio: 32.6, cum: 81.5},
+    {pos: 66, nombre: "Javier Sanchez", team: "Daniel", nivel: "Junior", cuentas: 242, prio: 32.2, cum: 80.5},
+    {pos: 67, nombre: "David Jose Iglesias Gonzalez", team: "Jorge", nivel: "Senior", cuentas: 213, prio: 32.1, cum: 80.2},
+    {pos: 68, nombre: "Rebeca Alberca Tato", team: "Jorge", nivel: "Mid", cuentas: 217, prio: 32.1, cum: 80.2},
+    {pos: 69, nombre: "Samuel Perez Torres", team: "Luis", nivel: "Junior", cuentas: 231, prio: 31.8, cum: 79.5},
+    {pos: 70, nombre: "Mateo Cepeda", team: "David", nivel: "Junior", cuentas: 224, prio: 31.7, cum: 79.2},
+    {pos: 71, nombre: "Eva Reina Almajano", team: "Lidia", nivel: "Senior", cuentas: 189, prio: 31.6, cum: 79.0},
+    {pos: 72, nombre: "Carlos Roman", team: "Jorge", nivel: "Junior", cuentas: 218, prio: 31.4, cum: 78.5},
+    {pos: 73, nombre: "Pablo Garcia", team: "Daniel", nivel: "Junior", cuentas: 244, prio: 31.3, cum: 78.2},
+    {pos: 74, nombre: "Gabriela Crespo", team: "David", nivel: "Junior", cuentas: 178, prio: 30.6, cum: 76.5},
+    {pos: 75, nombre: "Alejandro Alvarez", team: "David", nivel: "Junior", cuentas: 205, prio: 30.2, cum: 75.5},
+    {pos: 76, nombre: "Dario Anton Lopez", team: "Lidia", nivel: "Senior", cuentas: 195, prio: 29.9, cum: 74.8},
+    {pos: 77, nombre: "Pablo Ortega", team: "Luis", nivel: "Junior", cuentas: 244, prio: 29.8, cum: 74.5},
+    {pos: 78, nombre: "Daniel Borge", team: "Daniel", nivel: "Junior", cuentas: 232, prio: 29.5, cum: 73.8},
+    {pos: 79, nombre: "Guillermo Krahe", team: "Daniel", nivel: "Mid", cuentas: 208, prio: 29.3, cum: 73.2},
+    {pos: 80, nombre: "Eric Gonzalez", team: "David", nivel: "Senior", cuentas: 213, prio: 29.0, cum: 72.5},
+    {pos: 81, nombre: "Natalia Mancho Redondo", team: "Tamara", nivel: "Senior", cuentas: 190, prio: 28.9, cum: 72.2},
+    {pos: 82, nombre: "Juan Carlos Barrado Campo", team: "Luis", nivel: "Junior", cuentas: 201, prio: 28.9, cum: 72.2},
+    {pos: 83, nombre: "Joel Ledesma Del Alamo", team: "Carla", nivel: "Mid", cuentas: 210, prio: 28.3, cum: 70.8},
+    {pos: 84, nombre: "Jose Garcia", team: "David", nivel: "Senior", cuentas: 206, prio: 28.0, cum: 70.0},
+    {pos: 85, nombre: "Javier Hernandez", team: "Daniel", nivel: "Junior", cuentas: 204, prio: 27.6, cum: 69.0},
+    {pos: 86, nombre: "Javier Garcia Palacios", team: "Luis", nivel: "Junior", cuentas: 204, prio: 26.7, cum: 66.8},
+    {pos: 87, nombre: "Victor Vidal Vazquez", team: "Carla", nivel: "Mid", cuentas: 210, prio: 26.2, cum: 65.5},
+    {pos: 88, nombre: "Victor Manuel Rodriguez Martinez", team: "David", nivel: "Senior", cuentas: 206, prio: 24.9, cum: 62.2},
+    {pos: 89, nombre: "Sergio Antolin De Leon", team: "Daniel", nivel: "Senior", cuentas: 206, prio: 24.9, cum: 62.2},
+    {pos: 90, nombre: "Mikel Cano Mena", team: "Jorge", nivel: "Mid", cuentas: 203, prio: 24.6, cum: 61.5},
+    {pos: 91, nombre: "Nuria Utrilla Ramirez", team: "Daniel", nivel: "Junior", cuentas: 249, prio: 21.0, cum: 52.5},
+    {pos: 92, nombre: "Rosa Maria Trujillo Martinez", team: "Daniel", nivel: "Senior", cuentas: 206, prio: 16.5, cum: 41.2}
+  ];
+
+  // Datos del TEST (25 AMs)
+  const testData = [
+    {pos: 1, nombre: "Adrian Torremocha Carcedo", team: "Lidia", nivel: "Junior", cuentas: 242, prio: 45.5, ya_contactado: 7, grupos: 8, cuestiones: 3, vacaciones: 0},
+    {pos: 2, nombre: "Arantxa Olmeda", team: "David", nivel: "Mid", cuentas: 215, prio: 37.1, ya_contactado: 26, grupos: 44, cuestiones: 6, vacaciones: 0},
+    {pos: 3, nombre: "Carlos Carmona Rodriguez", team: "Lidia", nivel: "Mid", cuentas: 205, prio: 40.1, ya_contactado: 3, grupos: 0, cuestiones: 0, vacaciones: 0},
+    {pos: 4, nombre: "Carolina Fallos", team: "David", nivel: "Junior", cuentas: 226, prio: 44.5, ya_contactado: 0, grupos: 3, cuestiones: 2, vacaciones: 0},
+    {pos: 5, nombre: "Dario Anton Lopez", team: "Lidia", nivel: "Senior", cuentas: 195, prio: 29.9, ya_contactado: 4, grupos: 1, cuestiones: 0, vacaciones: 0},
+    {pos: 6, nombre: "Eric Gonzalez i Moreno", team: "David", nivel: "Junior", cuentas: 227, prio: 29.0, ya_contactado: 8, grupos: 9, cuestiones: 3, vacaciones: 0},
+    {pos: 7, nombre: "Eva Reina Almajano", team: "Lidia", nivel: "Senior", cuentas: 189, prio: 31.6, ya_contactado: 10, grupos: 5, cuestiones: 4, vacaciones: 0},
+    {pos: 8, nombre: "Gonzalo Gallego de la Peña", team: "Lidia", nivel: "Junior", cuentas: 179, prio: 40.6, ya_contactado: 1, grupos: 2, cuestiones: 1, vacaciones: 0},
+    {pos: 9, nombre: "Guillermo Arias Esteban", team: "Lidia", nivel: "Mid", cuentas: 208, prio: 35.0, ya_contactado: 3, grupos: 0, cuestiones: 0, vacaciones: 0},
+    {pos: 10, nombre: "Javiera Maritz Iñigo Sanchez", team: "Lidia", nivel: "Junior", cuentas: 229, prio: 37.5, ya_contactado: 22, grupos: 6, cuestiones: 7, vacaciones: 0},
+    {pos: 11, nombre: "Jose Carlos Bolobaha Oyo", team: "David", nivel: "Junior", cuentas: 215, prio: 43.0, ya_contactado: 5, grupos: 6, cuestiones: 1, vacaciones: 0},
+    {pos: 12, nombre: "Jose Garcia", team: "David", nivel: "Junior", cuentas: 206, prio: 28.0, ya_contactado: 5, grupos: 13, cuestiones: 3, vacaciones: 0},
+    {pos: 13, nombre: "Jose Gonnella", team: "David", nivel: "Junior", cuentas: 201, prio: 36.3, ya_contactado: 1, grupos: 6, cuestiones: 2, vacaciones: 0},
+    {pos: 14, nombre: "Judith Vegas Villanueva", team: "Lidia", nivel: "Senior", cuentas: 223, prio: 32.6, ya_contactado: 40, grupos: 2, cuestiones: 3, vacaciones: 0},
+    {pos: 15, nombre: "Luis Sixto", team: "Lidia", nivel: "Junior", cuentas: 181, prio: 38.5, ya_contactado: 18, grupos: 8, cuestiones: 1, vacaciones: 0},
+    {pos: 16, nombre: "Lydia Rivas Centella", team: "Lidia", nivel: "Junior", cuentas: 225, prio: 33.5, ya_contactado: 2, grupos: 1, cuestiones: 4, vacaciones: 0},
+    {pos: 17, nombre: "Maria Alejandra Hernandez Huertas", team: "David", nivel: "Junior", cuentas: 237, prio: 43.1, ya_contactado: 20, grupos: 40, cuestiones: 6, vacaciones: 0},
+    {pos: 18, nombre: "Maria Dolores Lara Rosales", team: "David", nivel: "Senior", cuentas: 229, prio: 45.9, ya_contactado: 41, grupos: 24, cuestiones: 1, vacaciones: 0},
+    {pos: 19, nombre: "Mateo Cepeda", team: "David", nivel: "Junior", cuentas: 224, prio: 31.7, ya_contactado: 1, grupos: 1, cuestiones: 0, vacaciones: 0},
+    {pos: 20, nombre: "Paula Guerrero Garcia", team: "Lidia", nivel: "Junior", cuentas: 244, prio: 54.4, ya_contactado: 16, grupos: 3, cuestiones: 0, vacaciones: 0},
+    {pos: 21, nombre: "Ruben Palacios Liebana", team: "David", nivel: "Senior", cuentas: 200, prio: 35.4, ya_contactado: 1, grupos: 20, cuestiones: 0, vacaciones: 0},
+    {pos: 22, nombre: "Sandra Santos Silva", team: "Lidia", nivel: "Junior", cuentas: 227, prio: 46.5, ya_contactado: 1, grupos: 1, cuestiones: 0, vacaciones: 0},
+    {pos: 23, nombre: "Sara Reguero Francés", team: "David", nivel: "Junior", cuentas: 185, prio: 30.2, ya_contactado: 1, grupos: 16, cuestiones: 0, vacaciones: 0},
+    {pos: 24, nombre: "Victor Gomez Gutierrez ⚠️ BAJA DEFINITIVA", team: "David", nivel: "Senior", cuentas: 0, prio: 35.0, ya_contactado: 0, grupos: 0, cuestiones: 0, vacaciones: 0},
+    {pos: 25, nombre: "Victor Rodriguez Martinez", team: "David", nivel: "Senior", cuentas: 206, prio: 24.9, ya_contactado: 6, grupos: 19, cuestiones: 0, vacaciones: 0}
+  ];
+
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+
+    if (tabName === 'ranking') renderRanking();
+    else if (tabName === 'test') renderTest();
+  }
+
+  function renderRanking() {
+    const tbody = document.getElementById('ranking-body');
+    tbody.innerHTML = '';
+    rankingData.forEach(am => {
+      const nivelColor = am.nivel === 'Senior' ? '#FF6B35' : am.nivel === 'Mid' ? '#FF9F43' : '#004B87';
+      const row = `<tr>
+        <td>${am.pos}</td>
+        <td><strong>${am.nombre}</strong></td>
+        <td>${am.team}</td>
+        <td style="text-align: center;"><span style="background: ${nivelColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">${am.nivel}</span></td>
+        <td style="text-align: center;">${am.cuentas}</td>
+        <td style="text-align: center; font-weight: 600;">${am.prio}</td>
+        <td style="text-align: center; color: ${am.cum >= 100 ? '#059669' : '#f59e0b'};">${am.cum}%</td>
+      </tr>`;
+      tbody.innerHTML += row;
+    });
+  }
+
+  function renderTest() {
+    const tbody = document.getElementById('test-body');
+    tbody.innerHTML = '';
+    testData.forEach((am, idx) => {
+      const total = am.ya_contactado + am.grupos + am.cuestiones + am.vacaciones;
+      const row = `<tr>
+        <td>${idx + 1}</td>
+        <td><strong>${am.nombre}</strong></td>
+        <td>${am.team}</td>
+        <td>${am.nivel}</td>
+        <td style="text-align: center;">${am.cuentas}</td>
+        <td style="text-align: center;">${am.ya_contactado}</td>
+        <td style="text-align: center;">${am.grupos}</td>
+        <td style="text-align: center;">${am.cuestiones}</td>
+        <td style="text-align: center;">${am.vacaciones}</td>
+        <td style="text-align: center; font-weight: 600;">${total}</td>
+      </tr>`;
+      tbody.innerHTML += row;
+    });
+  }
+
+  window.addEventListener('load', () => {
+    renderRanking();
+
+    // Gráfico de razones (TAB 3)
+    const ctx2 = document.getElementById('razonesChart2').getContext('2d');
+    new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: ['Ya contactado (43.45%)', 'Grupos duplicados (24.96%)', 'Cuestiones comerciales (22.62%)', 'Vacaciones (8.97%)'],
+        datasets: [{
+          data: [43.45, 24.96, 22.62, 8.97],
+          backgroundColor: ['#004B87', '#FF6B35', '#FFA500', '#FFD700'],
+          borderColor: '#ffffff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+  });
+</script>
